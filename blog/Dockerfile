@@ -1,8 +1,17 @@
 FROM node:latest AS node
 FROM php:7.4-fpm-alpine
 
+# Copy composer.lock and composer.json
+COPY composer.lock composer.json /var/www/
+
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
+
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
+    install-php-extensions mbstring pdo_mysql zip exif pcntl gd
+
 
 WORKDIR /var/www
 
@@ -12,6 +21,8 @@ RUN apk update && apk add \
     libjpeg-turbo-dev \
     libpng-dev \
     libzip-dev \
+#    libfreetype6-dev \
+#    libjpeg62-turbo-dev \
 #    libonig-dev\
     zip \
     jpegoptim optipng pngquant gifsicle \
