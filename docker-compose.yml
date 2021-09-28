@@ -5,8 +5,17 @@ services:
       context: .
       dockerfile: Dockerfile
     image: tomw1808/laravelproject
-    container_name: app
+    container_name: blog
     restart: unless-stopped
+    environment:
+      # DB_CONNECTION=mysql
+      DB_HOST: db
+      # DB_PORT=3306
+      # DB_DATABASE=laravel
+      # DB_USERNAME=root
+      DB_PASSWORD: laraVel_passWord
+      SESSION_DRIVER: redis
+      REDIS_HOST: redis
     volumes: 
       - ./:/var/www
       - ./blog/config/php/local.ini:/usr/local/etc/php/conf.d/local.ini
@@ -25,3 +34,21 @@ services:
       - ./blog/config/nginx/conf.d/:/etc/nginx/conf.d/
     depends_on:
       - app
+
+  db:
+    image: mysql:latest
+    container_name: db
+    environment: 
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: laraVel_passWord
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    container_name: redis
+
+volumes:
+  dbdata:
+    driver: local
+
